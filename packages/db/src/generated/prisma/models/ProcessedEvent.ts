@@ -163,6 +163,7 @@ export type ProcessedEventWhereInput = {
 export type ProcessedEventOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  _relevance?: Prisma.ProcessedEventOrderByRelevanceInput
 }
 
 export type ProcessedEventWhereUniqueInput = Prisma.AtLeast<{
@@ -224,6 +225,12 @@ export type ProcessedEventUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ProcessedEventOrderByRelevanceInput = {
+  fields: Prisma.ProcessedEventOrderByRelevanceFieldEnum | Prisma.ProcessedEventOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type ProcessedEventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -246,15 +253,7 @@ export type ProcessedEventSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
 }, ExtArgs["result"]["processedEvent"]>
 
-export type ProcessedEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["processedEvent"]>
 
-export type ProcessedEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["processedEvent"]>
 
 export type ProcessedEventSelectScalar = {
   id?: boolean
@@ -387,30 +386,6 @@ export interface ProcessedEventDelegate<ExtArgs extends runtime.Types.Extensions
   createMany<T extends ProcessedEventCreateManyArgs>(args?: Prisma.SelectSubset<T, ProcessedEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many ProcessedEvents and returns the data saved in the database.
-   * @param {ProcessedEventCreateManyAndReturnArgs} args - Arguments to create many ProcessedEvents.
-   * @example
-   * // Create many ProcessedEvents
-   * const processedEvent = await prisma.processedEvent.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many ProcessedEvents and only return the `id`
-   * const processedEventWithIdOnly = await prisma.processedEvent.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends ProcessedEventCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ProcessedEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessedEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a ProcessedEvent.
    * @param {ProcessedEventDeleteArgs} args - Arguments to delete one ProcessedEvent.
    * @example
@@ -473,36 +448,6 @@ export interface ProcessedEventDelegate<ExtArgs extends runtime.Types.Extensions
    * 
    */
   updateMany<T extends ProcessedEventUpdateManyArgs>(args: Prisma.SelectSubset<T, ProcessedEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more ProcessedEvents and returns the data updated in the database.
-   * @param {ProcessedEventUpdateManyAndReturnArgs} args - Arguments to update many ProcessedEvents.
-   * @example
-   * // Update many ProcessedEvents
-   * const processedEvent = await prisma.processedEvent.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more ProcessedEvents and only return the `id`
-   * const processedEventWithIdOnly = await prisma.processedEvent.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends ProcessedEventUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ProcessedEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessedEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one ProcessedEvent.
@@ -908,25 +853,6 @@ export type ProcessedEventCreateManyArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * ProcessedEvent createManyAndReturn
- */
-export type ProcessedEventCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ProcessedEvent
-   */
-  select?: Prisma.ProcessedEventSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the ProcessedEvent
-   */
-  omit?: Prisma.ProcessedEventOmit<ExtArgs> | null
-  /**
-   * The data used to create many ProcessedEvents.
-   */
-  data: Prisma.ProcessedEventCreateManyInput | Prisma.ProcessedEventCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * ProcessedEvent update
  */
 export type ProcessedEventUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -952,32 +878,6 @@ export type ProcessedEventUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
  * ProcessedEvent updateMany
  */
 export type ProcessedEventUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update ProcessedEvents.
-   */
-  data: Prisma.XOR<Prisma.ProcessedEventUpdateManyMutationInput, Prisma.ProcessedEventUncheckedUpdateManyInput>
-  /**
-   * Filter which ProcessedEvents to update
-   */
-  where?: Prisma.ProcessedEventWhereInput
-  /**
-   * Limit how many ProcessedEvents to update.
-   */
-  limit?: number
-}
-
-/**
- * ProcessedEvent updateManyAndReturn
- */
-export type ProcessedEventUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ProcessedEvent
-   */
-  select?: Prisma.ProcessedEventSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the ProcessedEvent
-   */
-  omit?: Prisma.ProcessedEventOmit<ExtArgs> | null
   /**
    * The data used to update ProcessedEvents.
    */

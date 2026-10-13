@@ -40,14 +40,17 @@ const TERMINAL = new Set(["filled", "cancelled", "rejected"]);
 
 export async function adjustSystemAccount(tx: Tx, table: "FeeAccount" | "InsuranceFund", market: string, delta: number) {
   if (delta === 0) return;
+  // MySQL compatible: Use UUID() function for MySQL
   await tx.$executeRawUnsafe(
-    `INSERT INTO "${table}" ("id", "market", "balance", "createdAt", "updatedAt") VALUES (gen_random_uuid()::text, $1, 0, NOW(), NOW()) ON CONFLICT ("market") DO NOTHING`,
+    `INSERT INTO \`${table}\` (\`id\`, \`market\`, \`balance\`, \`createdAt\`, \`updatedAt\`) 
+     VALUES (UUID(), ?, 0, NOW(), NOW()) 
+     ON DUPLICATE KEY UPDATE \`id\` = \`id\``,
     market,
   );
   await tx.$executeRawUnsafe(
-    `UPDATE "${table}" SET "balance" = ROUND(("balance" + $2)::numeric, 6)::double precision, "updatedAt" = NOW() WHERE "market" = $1`,
-    market,
+    `UPDATE \`${table}\` SET \`balance\` = ROUND(\`balance\` + ?, 6), \`updatedAt\` = NOW() WHERE \`market\` = ?`,
     delta,
+    market,
   );
 }
 
@@ -55,8 +58,9 @@ export async function lockUsers(tx: Tx, userIds: string[]): Promise<Map<string, 
   const ids = [...new Set(userIds)].sort();
   const users = new Map<string, UserState>();
   if (ids.length === 0) return users;
+  // MySQL uses backticks for identifiers
   const rows = await tx.$queryRaw<Array<{ id: string; balance: number; lockedBalance: number }>>`
-    SELECT "id", "balance", "lockedBalance" FROM "User" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`;
+    SELECT \`id\`, \`balance\`, \`lockedBalance\` FROM \`User\` WHERE \`id\` IN (${Prisma.join(ids)}) ORDER BY \`id\` FOR UPDATE`;
   for (const row of rows) {
     users.set(row.id, { id: row.id, balance: Number(row.balance), lockedBalance: Number(row.lockedBalance), dirty: false });
   }
@@ -80,8 +84,9 @@ export async function persistUsers(tx: Tx, users: Map<string, UserState>, log: L
 }
 
 export async function lockOpenPosition(tx: Tx, userId: string, market: string): Promise<Position | null> {
+  // MySQL uses backticks for identifiers
   const rows = await tx.$queryRaw<Array<{ id: string }>>`
-    SELECT "id" FROM "Position" WHERE "userId" = ${userId} AND "market" = ${market} AND "status" = 'open' FOR UPDATE`;
+    SELECT \`id\` FROM \`Position\` WHERE \`userId\` = ${userId} AND \`market\` = ${market} AND \`status\` = 'open' FOR UPDATE`;
   if (rows.length === 0) return null;
   return tx.position.findUnique({ where: { id: rows[0]!.id } });
 }
@@ -325,9 +330,13 @@ class Settlement {
 }
 
 export async function applyEngineResult(tx: Tx, result: EngineResult, log: Logger): Promise<SettlementOutcome> {
-  const inserted = await tx.$queryRaw<Array<{ id: string }>>`
-    INSERT INTO "ProcessedEvent" ("id", "createdAt") VALUES (${result.eventId}, NOW()) ON CONFLICT ("id") DO NOTHING RETURNING "id"`;
-  if (inserted.length === 0) return { applied: false, trades: 0, liquidations: [] };
+  // MySQL: Use INSERT IGNORE for idempotency
+  const inserted = await tx.$executeRawUnsafe(
+    `INSERT IGNORE INTO \`ProcessedEvent\` (\`id\`, \`createdAt\`) VALUES (?, NOW())`,
+    result.eventId
+  );
+  // Check if insert was successful (affectedRows > 0)
+  if (inserted === 0) return { applied: false, trades: 0, liquidations: [] };
 
   const orderIds = new Set<string>([result.orderId]);
   for (const trade of result.trades) {
@@ -338,7 +347,8 @@ export async function applyEngineResult(tx: Tx, result: EngineResult, log: Logge
 
   const ids = [...orderIds].filter((id) => typeof id === "string" && id.length > 0).sort();
   if (ids.length > 0) {
-    await tx.$queryRaw`SELECT "id" FROM "Order" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`;
+    // MySQL uses backticks for identifiers
+    await tx.$queryRaw`SELECT \`id\` FROM \`Order\` WHERE \`id\` IN (${Prisma.join(ids)}) ORDER BY \`id\` FOR UPDATE`;
   }
   const orderRows = ids.length > 0 ? await tx.order.findMany({ where: { id: { in: ids } } }) : [];
   const orders = new Map<string, OrderState>(orderRows.map((row) => [row.id, { ...row, dirty: false }]));

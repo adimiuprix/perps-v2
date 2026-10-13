@@ -307,6 +307,7 @@ export type PositionHistoryOrderByWithRelationInput = {
   pnl?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  _relevance?: Prisma.PositionHistoryOrderByRelevanceInput
 }
 
 export type PositionHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -470,6 +471,12 @@ export type PositionHistoryUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type PositionHistoryOrderByRelevanceInput = {
+  fields: Prisma.PositionHistoryOrderByRelevanceFieldEnum | Prisma.PositionHistoryOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type PositionHistoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -550,35 +557,7 @@ export type PositionHistorySelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdAt?: boolean
 }, ExtArgs["result"]["positionHistory"]>
 
-export type PositionHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  userId?: boolean
-  market?: boolean
-  side?: boolean
-  quantity?: boolean
-  entryPrice?: boolean
-  exitPrice?: boolean
-  leverage?: boolean
-  margin?: boolean
-  pnl?: boolean
-  reason?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["positionHistory"]>
 
-export type PositionHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  userId?: boolean
-  market?: boolean
-  side?: boolean
-  quantity?: boolean
-  entryPrice?: boolean
-  exitPrice?: boolean
-  leverage?: boolean
-  margin?: boolean
-  pnl?: boolean
-  reason?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["positionHistory"]>
 
 export type PositionHistorySelectScalar = {
   id?: boolean
@@ -731,30 +710,6 @@ export interface PositionHistoryDelegate<ExtArgs extends runtime.Types.Extension
   createMany<T extends PositionHistoryCreateManyArgs>(args?: Prisma.SelectSubset<T, PositionHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many PositionHistories and returns the data saved in the database.
-   * @param {PositionHistoryCreateManyAndReturnArgs} args - Arguments to create many PositionHistories.
-   * @example
-   * // Create many PositionHistories
-   * const positionHistory = await prisma.positionHistory.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many PositionHistories and only return the `id`
-   * const positionHistoryWithIdOnly = await prisma.positionHistory.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends PositionHistoryCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, PositionHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PositionHistoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a PositionHistory.
    * @param {PositionHistoryDeleteArgs} args - Arguments to delete one PositionHistory.
    * @example
@@ -817,36 +772,6 @@ export interface PositionHistoryDelegate<ExtArgs extends runtime.Types.Extension
    * 
    */
   updateMany<T extends PositionHistoryUpdateManyArgs>(args: Prisma.SelectSubset<T, PositionHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more PositionHistories and returns the data updated in the database.
-   * @param {PositionHistoryUpdateManyAndReturnArgs} args - Arguments to update many PositionHistories.
-   * @example
-   * // Update many PositionHistories
-   * const positionHistory = await prisma.positionHistory.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more PositionHistories and only return the `id`
-   * const positionHistoryWithIdOnly = await prisma.positionHistory.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends PositionHistoryUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, PositionHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PositionHistoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one PositionHistory.
@@ -1262,25 +1187,6 @@ export type PositionHistoryCreateManyArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
- * PositionHistory createManyAndReturn
- */
-export type PositionHistoryCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the PositionHistory
-   */
-  select?: Prisma.PositionHistorySelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the PositionHistory
-   */
-  omit?: Prisma.PositionHistoryOmit<ExtArgs> | null
-  /**
-   * The data used to create many PositionHistories.
-   */
-  data: Prisma.PositionHistoryCreateManyInput | Prisma.PositionHistoryCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * PositionHistory update
  */
 export type PositionHistoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1306,32 +1212,6 @@ export type PositionHistoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
  * PositionHistory updateMany
  */
 export type PositionHistoryUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update PositionHistories.
-   */
-  data: Prisma.XOR<Prisma.PositionHistoryUpdateManyMutationInput, Prisma.PositionHistoryUncheckedUpdateManyInput>
-  /**
-   * Filter which PositionHistories to update
-   */
-  where?: Prisma.PositionHistoryWhereInput
-  /**
-   * Limit how many PositionHistories to update.
-   */
-  limit?: number
-}
-
-/**
- * PositionHistory updateManyAndReturn
- */
-export type PositionHistoryUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the PositionHistory
-   */
-  select?: Prisma.PositionHistorySelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the PositionHistory
-   */
-  omit?: Prisma.PositionHistoryOmit<ExtArgs> | null
   /**
    * The data used to update PositionHistories.
    */

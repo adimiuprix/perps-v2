@@ -308,6 +308,7 @@ export type FillOrderByWithRelationInput = {
   sellerFee?: Prisma.SortOrder
   takerSide?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  _relevance?: Prisma.FillOrderByRelevanceInput
 }
 
 export type FillWhereUniqueInput = Prisma.AtLeast<{
@@ -481,6 +482,12 @@ export type FillUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type FillOrderByRelevanceInput = {
+  fields: Prisma.FillOrderByRelevanceFieldEnum | Prisma.FillOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type FillCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tradeId?: Prisma.SortOrder
@@ -561,37 +568,7 @@ export type FillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
 }, ExtArgs["result"]["fill"]>
 
-export type FillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  tradeId?: boolean
-  buyOrderId?: boolean
-  sellOrderId?: boolean
-  buyerId?: boolean
-  sellerId?: boolean
-  market?: boolean
-  price?: boolean
-  quantity?: boolean
-  buyerFee?: boolean
-  sellerFee?: boolean
-  takerSide?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fill"]>
 
-export type FillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  tradeId?: boolean
-  buyOrderId?: boolean
-  sellOrderId?: boolean
-  buyerId?: boolean
-  sellerId?: boolean
-  market?: boolean
-  price?: boolean
-  quantity?: boolean
-  buyerFee?: boolean
-  sellerFee?: boolean
-  takerSide?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fill"]>
 
 export type FillSelectScalar = {
   id?: boolean
@@ -746,30 +723,6 @@ export interface FillDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
   createMany<T extends FillCreateManyArgs>(args?: Prisma.SelectSubset<T, FillCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many Fills and returns the data saved in the database.
-   * @param {FillCreateManyAndReturnArgs} args - Arguments to create many Fills.
-   * @example
-   * // Create many Fills
-   * const fill = await prisma.fill.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many Fills and only return the `id`
-   * const fillWithIdOnly = await prisma.fill.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends FillCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FillCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a Fill.
    * @param {FillDeleteArgs} args - Arguments to delete one Fill.
    * @example
@@ -832,36 +785,6 @@ export interface FillDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
    * 
    */
   updateMany<T extends FillUpdateManyArgs>(args: Prisma.SelectSubset<T, FillUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more Fills and returns the data updated in the database.
-   * @param {FillUpdateManyAndReturnArgs} args - Arguments to update many Fills.
-   * @example
-   * // Update many Fills
-   * const fill = await prisma.fill.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more Fills and only return the `id`
-   * const fillWithIdOnly = await prisma.fill.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends FillUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FillUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one Fill.
@@ -1278,25 +1201,6 @@ export type FillCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Fill createManyAndReturn
- */
-export type FillCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Fill
-   */
-  select?: Prisma.FillSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the Fill
-   */
-  omit?: Prisma.FillOmit<ExtArgs> | null
-  /**
-   * The data used to create many Fills.
-   */
-  data: Prisma.FillCreateManyInput | Prisma.FillCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * Fill update
  */
 export type FillUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1322,32 +1226,6 @@ export type FillUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
  * Fill updateMany
  */
 export type FillUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update Fills.
-   */
-  data: Prisma.XOR<Prisma.FillUpdateManyMutationInput, Prisma.FillUncheckedUpdateManyInput>
-  /**
-   * Filter which Fills to update
-   */
-  where?: Prisma.FillWhereInput
-  /**
-   * Limit how many Fills to update.
-   */
-  limit?: number
-}
-
-/**
- * Fill updateManyAndReturn
- */
-export type FillUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Fill
-   */
-  select?: Prisma.FillSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the Fill
-   */
-  omit?: Prisma.FillOmit<ExtArgs> | null
   /**
    * The data used to update Fills.
    */

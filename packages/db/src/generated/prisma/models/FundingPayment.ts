@@ -233,6 +233,7 @@ export type FundingPaymentOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   side?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  _relevance?: Prisma.FundingPaymentOrderByRelevanceInput
 }
 
 export type FundingPaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -336,6 +337,12 @@ export type FundingPaymentUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type FundingPaymentOrderByRelevanceInput = {
+  fields: Prisma.FundingPaymentOrderByRelevanceFieldEnum | Prisma.FundingPaymentOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type FundingPaymentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -382,23 +389,7 @@ export type FundingPaymentSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
 }, ExtArgs["result"]["fundingPayment"]>
 
-export type FundingPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  userId?: boolean
-  market?: boolean
-  amount?: boolean
-  side?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fundingPayment"]>
 
-export type FundingPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  userId?: boolean
-  market?: boolean
-  amount?: boolean
-  side?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fundingPayment"]>
 
 export type FundingPaymentSelectScalar = {
   id?: boolean
@@ -539,30 +530,6 @@ export interface FundingPaymentDelegate<ExtArgs extends runtime.Types.Extensions
   createMany<T extends FundingPaymentCreateManyArgs>(args?: Prisma.SelectSubset<T, FundingPaymentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many FundingPayments and returns the data saved in the database.
-   * @param {FundingPaymentCreateManyAndReturnArgs} args - Arguments to create many FundingPayments.
-   * @example
-   * // Create many FundingPayments
-   * const fundingPayment = await prisma.fundingPayment.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many FundingPayments and only return the `id`
-   * const fundingPaymentWithIdOnly = await prisma.fundingPayment.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends FundingPaymentCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FundingPaymentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FundingPaymentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a FundingPayment.
    * @param {FundingPaymentDeleteArgs} args - Arguments to delete one FundingPayment.
    * @example
@@ -625,36 +592,6 @@ export interface FundingPaymentDelegate<ExtArgs extends runtime.Types.Extensions
    * 
    */
   updateMany<T extends FundingPaymentUpdateManyArgs>(args: Prisma.SelectSubset<T, FundingPaymentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more FundingPayments and returns the data updated in the database.
-   * @param {FundingPaymentUpdateManyAndReturnArgs} args - Arguments to update many FundingPayments.
-   * @example
-   * // Update many FundingPayments
-   * const fundingPayment = await prisma.fundingPayment.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more FundingPayments and only return the `id`
-   * const fundingPaymentWithIdOnly = await prisma.fundingPayment.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends FundingPaymentUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FundingPaymentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FundingPaymentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one FundingPayment.
@@ -1064,25 +1001,6 @@ export type FundingPaymentCreateManyArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * FundingPayment createManyAndReturn
- */
-export type FundingPaymentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FundingPayment
-   */
-  select?: Prisma.FundingPaymentSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FundingPayment
-   */
-  omit?: Prisma.FundingPaymentOmit<ExtArgs> | null
-  /**
-   * The data used to create many FundingPayments.
-   */
-  data: Prisma.FundingPaymentCreateManyInput | Prisma.FundingPaymentCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * FundingPayment update
  */
 export type FundingPaymentUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1108,32 +1026,6 @@ export type FundingPaymentUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
  * FundingPayment updateMany
  */
 export type FundingPaymentUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update FundingPayments.
-   */
-  data: Prisma.XOR<Prisma.FundingPaymentUpdateManyMutationInput, Prisma.FundingPaymentUncheckedUpdateManyInput>
-  /**
-   * Filter which FundingPayments to update
-   */
-  where?: Prisma.FundingPaymentWhereInput
-  /**
-   * Limit how many FundingPayments to update.
-   */
-  limit?: number
-}
-
-/**
- * FundingPayment updateManyAndReturn
- */
-export type FundingPaymentUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FundingPayment
-   */
-  select?: Prisma.FundingPaymentSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FundingPayment
-   */
-  omit?: Prisma.FundingPaymentOmit<ExtArgs> | null
   /**
    * The data used to update FundingPayments.
    */

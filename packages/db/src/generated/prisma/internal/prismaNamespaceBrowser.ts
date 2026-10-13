@@ -233,12 +233,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
+export const UserOrderByRelevanceFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash'
 } as const
 
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
 
 
 export const NullsOrder = {
@@ -247,4 +248,96 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const OrderOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  market: 'market',
+  side: 'side',
+  type: 'type',
+  status: 'status',
+  source: 'source',
+  reason: 'reason',
+  engineSeq: 'engineSeq'
+} as const
+
+export type OrderOrderByRelevanceFieldEnum = (typeof OrderOrderByRelevanceFieldEnum)[keyof typeof OrderOrderByRelevanceFieldEnum]
+
+
+export const FillOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradeId: 'tradeId',
+  buyOrderId: 'buyOrderId',
+  sellOrderId: 'sellOrderId',
+  buyerId: 'buyerId',
+  sellerId: 'sellerId',
+  market: 'market',
+  takerSide: 'takerSide'
+} as const
+
+export type FillOrderByRelevanceFieldEnum = (typeof FillOrderByRelevanceFieldEnum)[keyof typeof FillOrderByRelevanceFieldEnum]
+
+
+export const PositionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  market: 'market',
+  side: 'side',
+  status: 'status'
+} as const
+
+export type PositionOrderByRelevanceFieldEnum = (typeof PositionOrderByRelevanceFieldEnum)[keyof typeof PositionOrderByRelevanceFieldEnum]
+
+
+export const InsuranceFundOrderByRelevanceFieldEnum = {
+  id: 'id',
+  market: 'market'
+} as const
+
+export type InsuranceFundOrderByRelevanceFieldEnum = (typeof InsuranceFundOrderByRelevanceFieldEnum)[keyof typeof InsuranceFundOrderByRelevanceFieldEnum]
+
+
+export const FundingRateOrderByRelevanceFieldEnum = {
+  id: 'id',
+  market: 'market'
+} as const
+
+export type FundingRateOrderByRelevanceFieldEnum = (typeof FundingRateOrderByRelevanceFieldEnum)[keyof typeof FundingRateOrderByRelevanceFieldEnum]
+
+
+export const FundingPaymentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  market: 'market',
+  side: 'side'
+} as const
+
+export type FundingPaymentOrderByRelevanceFieldEnum = (typeof FundingPaymentOrderByRelevanceFieldEnum)[keyof typeof FundingPaymentOrderByRelevanceFieldEnum]
+
+
+export const FeeAccountOrderByRelevanceFieldEnum = {
+  id: 'id',
+  market: 'market'
+} as const
+
+export type FeeAccountOrderByRelevanceFieldEnum = (typeof FeeAccountOrderByRelevanceFieldEnum)[keyof typeof FeeAccountOrderByRelevanceFieldEnum]
+
+
+export const PositionHistoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  market: 'market',
+  side: 'side',
+  reason: 'reason'
+} as const
+
+export type PositionHistoryOrderByRelevanceFieldEnum = (typeof PositionHistoryOrderByRelevanceFieldEnum)[keyof typeof PositionHistoryOrderByRelevanceFieldEnum]
+
+
+export const ProcessedEventOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type ProcessedEventOrderByRelevanceFieldEnum = (typeof ProcessedEventOrderByRelevanceFieldEnum)[keyof typeof ProcessedEventOrderByRelevanceFieldEnum]
 

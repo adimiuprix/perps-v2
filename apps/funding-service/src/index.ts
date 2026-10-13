@@ -48,11 +48,11 @@ async function runMarket(market: string, period: Date, price: number): Promise<R
     const users = new Map<string, { balance: number; lockedBalance: number }>();
     if (userIds.length > 0) {
       const rows = await tx.$queryRaw<Array<{ id: string; balance: number; lockedBalance: number }>>`
-        SELECT "id", "balance", "lockedBalance" FROM "User" WHERE "id" IN (${Prisma.join(userIds)}) ORDER BY "id" FOR UPDATE`;
+        SELECT \`id\`, \`balance\`, \`lockedBalance\` FROM \`User\` WHERE \`id\` IN (${Prisma.join(userIds)}) ORDER BY \`id\` FOR UPDATE`;
       for (const row of rows) users.set(row.id, { balance: Number(row.balance), lockedBalance: Number(row.lockedBalance) });
     }
     const locked = await tx.$queryRaw<Array<{ id: string }>>`
-      SELECT "id" FROM "Position" WHERE "market" = ${market} AND "status" = 'open' ORDER BY "id" FOR UPDATE`;
+      SELECT \`id\` FROM \`Position\` WHERE \`market\` = ${market} AND \`status\` = 'open' ORDER BY \`id\` FOR UPDATE`;
     const positions = (
       await tx.position.findMany({ where: { id: { in: locked.map((p) => p.id) } }, orderBy: { id: "asc" } })
     ).filter((p) => users.has(p.userId));

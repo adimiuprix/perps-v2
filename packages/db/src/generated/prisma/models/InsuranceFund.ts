@@ -224,6 +224,7 @@ export type InsuranceFundOrderByWithRelationInput = {
   balance?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  _relevance?: Prisma.InsuranceFundOrderByRelevanceInput
 }
 
 export type InsuranceFundWhereUniqueInput = Prisma.AtLeast<{
@@ -317,6 +318,12 @@ export type InsuranceFundUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type InsuranceFundOrderByRelevanceInput = {
+  fields: Prisma.InsuranceFundOrderByRelevanceFieldEnum | Prisma.InsuranceFundOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type InsuranceFundCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   market?: Prisma.SortOrder
@@ -359,21 +366,7 @@ export type InsuranceFundSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
 }, ExtArgs["result"]["insuranceFund"]>
 
-export type InsuranceFundSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  balance?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-}, ExtArgs["result"]["insuranceFund"]>
 
-export type InsuranceFundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  balance?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-}, ExtArgs["result"]["insuranceFund"]>
 
 export type InsuranceFundSelectScalar = {
   id?: boolean
@@ -512,30 +505,6 @@ export interface InsuranceFundDelegate<ExtArgs extends runtime.Types.Extensions.
   createMany<T extends InsuranceFundCreateManyArgs>(args?: Prisma.SelectSubset<T, InsuranceFundCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many InsuranceFunds and returns the data saved in the database.
-   * @param {InsuranceFundCreateManyAndReturnArgs} args - Arguments to create many InsuranceFunds.
-   * @example
-   * // Create many InsuranceFunds
-   * const insuranceFund = await prisma.insuranceFund.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many InsuranceFunds and only return the `id`
-   * const insuranceFundWithIdOnly = await prisma.insuranceFund.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends InsuranceFundCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, InsuranceFundCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceFundPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a InsuranceFund.
    * @param {InsuranceFundDeleteArgs} args - Arguments to delete one InsuranceFund.
    * @example
@@ -598,36 +567,6 @@ export interface InsuranceFundDelegate<ExtArgs extends runtime.Types.Extensions.
    * 
    */
   updateMany<T extends InsuranceFundUpdateManyArgs>(args: Prisma.SelectSubset<T, InsuranceFundUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more InsuranceFunds and returns the data updated in the database.
-   * @param {InsuranceFundUpdateManyAndReturnArgs} args - Arguments to update many InsuranceFunds.
-   * @example
-   * // Update many InsuranceFunds
-   * const insuranceFund = await prisma.insuranceFund.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more InsuranceFunds and only return the `id`
-   * const insuranceFundWithIdOnly = await prisma.insuranceFund.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends InsuranceFundUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, InsuranceFundUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceFundPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one InsuranceFund.
@@ -1036,25 +975,6 @@ export type InsuranceFundCreateManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * InsuranceFund createManyAndReturn
- */
-export type InsuranceFundCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the InsuranceFund
-   */
-  select?: Prisma.InsuranceFundSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the InsuranceFund
-   */
-  omit?: Prisma.InsuranceFundOmit<ExtArgs> | null
-  /**
-   * The data used to create many InsuranceFunds.
-   */
-  data: Prisma.InsuranceFundCreateManyInput | Prisma.InsuranceFundCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * InsuranceFund update
  */
 export type InsuranceFundUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1080,32 +1000,6 @@ export type InsuranceFundUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
  * InsuranceFund updateMany
  */
 export type InsuranceFundUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update InsuranceFunds.
-   */
-  data: Prisma.XOR<Prisma.InsuranceFundUpdateManyMutationInput, Prisma.InsuranceFundUncheckedUpdateManyInput>
-  /**
-   * Filter which InsuranceFunds to update
-   */
-  where?: Prisma.InsuranceFundWhereInput
-  /**
-   * Limit how many InsuranceFunds to update.
-   */
-  limit?: number
-}
-
-/**
- * InsuranceFund updateManyAndReturn
- */
-export type InsuranceFundUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the InsuranceFund
-   */
-  select?: Prisma.InsuranceFundSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the InsuranceFund
-   */
-  omit?: Prisma.InsuranceFundOmit<ExtArgs> | null
   /**
    * The data used to update InsuranceFunds.
    */

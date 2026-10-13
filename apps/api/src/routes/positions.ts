@@ -40,7 +40,32 @@ positionsRouter.post("/positions/close", authMiddleware, async (req, res) => {
   if (!position) throw new HttpError(404, "Position not found");
   if (!isMarketId(position.market)) throw new HttpError(400, "Unsupported market");
 
-  const placed = await placeOrder({
+  // Check if there's already a pending close order
+  const existingCloseOrder = await prisma.order.findFirst({
+    where: {
+      userId,
+      market: position.market,
+      side: position.side === "long" ? "sell" : "buy",
+      reduceOnly: true,
+      status: { in: ["open", "partial"] },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (existingCloseOrder) {
+    // Already has a pending close order
+    res.json({
+      success: true,
+      message: "Close order already pending",
+      orderId: existingCloseOrder.id,
+      type: existingCloseOrder.type,
+      existing: true,
+    });
+    return;
+  }
+
+  // Try market order first
+  let placed = await placeOrder({
     userId,
     market: position.market,
     side: position.side === "long" ? "sell" : "buy",
@@ -50,13 +75,45 @@ positionsRouter.post("/positions/close", authMiddleware, async (req, res) => {
     reduceOnly: true,
     source: "close",
   });
-  const order = await waitForOrder(placed.id, (o) => isTerminal(o.status), 5_000);
+  let order = await waitForOrder(placed.id, (o) => isTerminal(o.status), 5_000);
+  
+  // If market order rejected due to no liquidity, try limit order at mark price
+  if (order && order.status === "rejected" && order.reason === "no_liquidity") {
+    const index = await getIndexPrice(redis, position.market);
+    if (index.fresh && index.price) {
+      // Use limit order at current mark price
+      placed = await placeOrder({
+        userId,
+        market: position.market,
+        side: position.side === "long" ? "sell" : "buy",
+        type: "limit",
+        price: index.price,
+        quantity: position.quantity,
+        leverage: Math.max(1, Math.round(position.leverage)),
+        reduceOnly: true,
+        source: "close",
+      });
+      order = await waitForOrder(placed.id, (o) => o.acceptedAt !== null, 3_000);
+      // Return early for limit order - it will be filled when matched
+      res.json({ 
+        success: true, 
+        message: "Close order placed (limit order)", 
+        orderId: placed.id,
+        type: "limit"
+      });
+      return;
+    }
+  }
+  
   if (!order || !isTerminal(order.status)) {
     res.status(202).json({ success: true, message: "Close order submitted", orderId: placed.id });
     return;
   }
   if (order.status === "rejected") {
-    throw new HttpError(409, order.reason === "no_liquidity" ? "No liquidity available to close this position." : rejectionMessage(order.reason));
+    const message = order.reason === "no_liquidity" 
+      ? "No liquidity available to close this position." 
+      : rejectionMessage(order.reason);
+    throw new HttpError(409, message);
   }
   const history = await prisma.positionHistory.findMany({
     where: { userId, market: position.market, createdAt: { gte: placed.createdAt } },

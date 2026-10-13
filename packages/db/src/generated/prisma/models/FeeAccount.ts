@@ -224,6 +224,7 @@ export type FeeAccountOrderByWithRelationInput = {
   balance?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  _relevance?: Prisma.FeeAccountOrderByRelevanceInput
 }
 
 export type FeeAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -317,6 +318,12 @@ export type FeeAccountUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type FeeAccountOrderByRelevanceInput = {
+  fields: Prisma.FeeAccountOrderByRelevanceFieldEnum | Prisma.FeeAccountOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type FeeAccountCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   market?: Prisma.SortOrder
@@ -359,21 +366,7 @@ export type FeeAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
 }, ExtArgs["result"]["feeAccount"]>
 
-export type FeeAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  balance?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-}, ExtArgs["result"]["feeAccount"]>
 
-export type FeeAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  balance?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-}, ExtArgs["result"]["feeAccount"]>
 
 export type FeeAccountSelectScalar = {
   id?: boolean
@@ -512,30 +505,6 @@ export interface FeeAccountDelegate<ExtArgs extends runtime.Types.Extensions.Int
   createMany<T extends FeeAccountCreateManyArgs>(args?: Prisma.SelectSubset<T, FeeAccountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many FeeAccounts and returns the data saved in the database.
-   * @param {FeeAccountCreateManyAndReturnArgs} args - Arguments to create many FeeAccounts.
-   * @example
-   * // Create many FeeAccounts
-   * const feeAccount = await prisma.feeAccount.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many FeeAccounts and only return the `id`
-   * const feeAccountWithIdOnly = await prisma.feeAccount.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends FeeAccountCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FeeAccountCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeAccountPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a FeeAccount.
    * @param {FeeAccountDeleteArgs} args - Arguments to delete one FeeAccount.
    * @example
@@ -598,36 +567,6 @@ export interface FeeAccountDelegate<ExtArgs extends runtime.Types.Extensions.Int
    * 
    */
   updateMany<T extends FeeAccountUpdateManyArgs>(args: Prisma.SelectSubset<T, FeeAccountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more FeeAccounts and returns the data updated in the database.
-   * @param {FeeAccountUpdateManyAndReturnArgs} args - Arguments to update many FeeAccounts.
-   * @example
-   * // Update many FeeAccounts
-   * const feeAccount = await prisma.feeAccount.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more FeeAccounts and only return the `id`
-   * const feeAccountWithIdOnly = await prisma.feeAccount.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends FeeAccountUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FeeAccountUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeAccountPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one FeeAccount.
@@ -1036,25 +975,6 @@ export type FeeAccountCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
- * FeeAccount createManyAndReturn
- */
-export type FeeAccountCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FeeAccount
-   */
-  select?: Prisma.FeeAccountSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FeeAccount
-   */
-  omit?: Prisma.FeeAccountOmit<ExtArgs> | null
-  /**
-   * The data used to create many FeeAccounts.
-   */
-  data: Prisma.FeeAccountCreateManyInput | Prisma.FeeAccountCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * FeeAccount update
  */
 export type FeeAccountUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1080,32 +1000,6 @@ export type FeeAccountUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
  * FeeAccount updateMany
  */
 export type FeeAccountUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update FeeAccounts.
-   */
-  data: Prisma.XOR<Prisma.FeeAccountUpdateManyMutationInput, Prisma.FeeAccountUncheckedUpdateManyInput>
-  /**
-   * Filter which FeeAccounts to update
-   */
-  where?: Prisma.FeeAccountWhereInput
-  /**
-   * Limit how many FeeAccounts to update.
-   */
-  limit?: number
-}
-
-/**
- * FeeAccount updateManyAndReturn
- */
-export type FeeAccountUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FeeAccount
-   */
-  select?: Prisma.FeeAccountSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FeeAccount
-   */
-  omit?: Prisma.FeeAccountOmit<ExtArgs> | null
   /**
    * The data used to update FeeAccounts.
    */

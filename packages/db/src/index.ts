@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient, Prisma } from "./generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import mariadb from "mariadb";
 
 export { Prisma };
 export type { User, Order, Fill, Position, PositionHistory, FundingRate, FundingPayment, FeeAccount, InsuranceFund } from "./generated/prisma/client";
@@ -10,9 +11,17 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not set");
 }
 
-const adapter = new PrismaPg({ connectionString, max: Number(process.env.DB_POOL_MAX ?? 10) });
+// Convert mysql:// to mariadb:// for the adapter (MariaDB is MySQL compatible)
+const mariadbConnectionString = connectionString.replace(/^mysql:\/\//, 'mariadb://');
 
-export const prisma = new PrismaClient({ adapter });
+// Prisma 7 with MySQL: Create connection pool and adapter
+const pool = mariadb.createPool(mariadbConnectionString);
+const adapter = new PrismaMariaDb(pool);
+
+export const prisma = new PrismaClient({
+  adapter,
+  log: ['error', 'warn'],
+});
 
 export type Tx = Prisma.TransactionClient;
 
@@ -20,7 +29,7 @@ function isRetryable(err: unknown): boolean {
   const code = (err as { code?: string }).code;
   if (code === "P2034" || code === "40001" || code === "40P01") return true;
   const message = String((err as Error)?.message ?? "");
-  return message.includes("deadlock detected") || message.includes("could not serialize") || message.includes("write conflict");
+  return message.includes("deadlock detected") || message.includes("could not serialize") || message.includes("write conflict") || message.includes("Lock wait timeout");
 }
 
 export async function withTransaction<T>(fn: (tx: Tx) => Promise<T>, attempts = 5): Promise<T> {

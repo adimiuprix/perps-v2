@@ -1,16 +1,23 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: perps-postgres
+  mysql:
+    image: mysql:8.0
+    container_name: perps-mysql
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: perps
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: perpsv2
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:7
     container_name: perps-redis
     ports:
       - "6379:6379"
+
+volumes:
+  mysql_data:

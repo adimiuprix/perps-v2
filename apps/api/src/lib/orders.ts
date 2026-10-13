@@ -81,7 +81,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
 
   const order = await withTransaction(async (tx) => {
     const users = await tx.$queryRaw<Array<{ id: string; balance: number; lockedBalance: number }>>`
-      SELECT "id", "balance", "lockedBalance" FROM "User" WHERE "id" = ${input.userId} FOR UPDATE`;
+      SELECT \`id\`, \`balance\`, \`lockedBalance\` FROM \`User\` WHERE \`id\` = ${input.userId} FOR UPDATE`;
     const user = users[0];
     if (!user) throw new HttpError(401, "Invalid token");
 
@@ -176,7 +176,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
   } catch (err) {
     log.error("failed to enqueue order, rolling back reservation", { orderId: order.id, err: serializeError(err) });
     await withTransaction(async (tx) => {
-      await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${order.userId} FOR UPDATE`;
+      await tx.$queryRaw`SELECT \`id\` FROM \`User\` WHERE \`id\` = ${order.userId} FOR UPDATE`;
       const current = await tx.order.findUnique({ where: { id: order.id } });
       if (!current || current.status !== "open" || current.acceptedAt !== null) return;
       const user = await tx.user.findUnique({ where: { id: order.userId } });

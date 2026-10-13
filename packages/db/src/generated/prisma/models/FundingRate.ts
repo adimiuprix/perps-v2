@@ -224,6 +224,7 @@ export type FundingRateOrderByWithRelationInput = {
   rate?: Prisma.SortOrder
   period?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  _relevance?: Prisma.FundingRateOrderByRelevanceInput
 }
 
 export type FundingRateWhereUniqueInput = Prisma.AtLeast<{
@@ -318,6 +319,12 @@ export type FundingRateUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type FundingRateOrderByRelevanceInput = {
+  fields: Prisma.FundingRateOrderByRelevanceFieldEnum | Prisma.FundingRateOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
+}
+
 export type FundingRateMarketPeriodCompoundUniqueInput = {
   market: string
   period: Date | string
@@ -365,21 +372,7 @@ export type FundingRateSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
 }, ExtArgs["result"]["fundingRate"]>
 
-export type FundingRateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  rate?: boolean
-  period?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fundingRate"]>
 
-export type FundingRateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  market?: boolean
-  rate?: boolean
-  period?: boolean
-  createdAt?: boolean
-}, ExtArgs["result"]["fundingRate"]>
 
 export type FundingRateSelectScalar = {
   id?: boolean
@@ -518,30 +511,6 @@ export interface FundingRateDelegate<ExtArgs extends runtime.Types.Extensions.In
   createMany<T extends FundingRateCreateManyArgs>(args?: Prisma.SelectSubset<T, FundingRateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many FundingRates and returns the data saved in the database.
-   * @param {FundingRateCreateManyAndReturnArgs} args - Arguments to create many FundingRates.
-   * @example
-   * // Create many FundingRates
-   * const fundingRate = await prisma.fundingRate.createManyAndReturn({
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Create many FundingRates and only return the `id`
-   * const fundingRateWithIdOnly = await prisma.fundingRate.createManyAndReturn({
-   *   select: { id: true },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  createManyAndReturn<T extends FundingRateCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FundingRateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FundingRatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-  /**
    * Delete a FundingRate.
    * @param {FundingRateDeleteArgs} args - Arguments to delete one FundingRate.
    * @example
@@ -604,36 +573,6 @@ export interface FundingRateDelegate<ExtArgs extends runtime.Types.Extensions.In
    * 
    */
   updateMany<T extends FundingRateUpdateManyArgs>(args: Prisma.SelectSubset<T, FundingRateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
-
-  /**
-   * Update zero or more FundingRates and returns the data updated in the database.
-   * @param {FundingRateUpdateManyAndReturnArgs} args - Arguments to update many FundingRates.
-   * @example
-   * // Update many FundingRates
-   * const fundingRate = await prisma.fundingRate.updateManyAndReturn({
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * 
-   * // Update zero or more FundingRates and only return the `id`
-   * const fundingRateWithIdOnly = await prisma.fundingRate.updateManyAndReturn({
-   *   select: { id: true },
-   *   where: {
-   *     // ... provide filter here
-   *   },
-   *   data: [
-   *     // ... provide data here
-   *   ]
-   * })
-   * Note, that providing `undefined` is treated as the value not being there.
-   * Read more here: https://pris.ly/d/null-undefined
-   * 
-   */
-  updateManyAndReturn<T extends FundingRateUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FundingRateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FundingRatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one FundingRate.
@@ -1042,25 +981,6 @@ export type FundingRateCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * FundingRate createManyAndReturn
- */
-export type FundingRateCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FundingRate
-   */
-  select?: Prisma.FundingRateSelectCreateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FundingRate
-   */
-  omit?: Prisma.FundingRateOmit<ExtArgs> | null
-  /**
-   * The data used to create many FundingRates.
-   */
-  data: Prisma.FundingRateCreateManyInput | Prisma.FundingRateCreateManyInput[]
-  skipDuplicates?: boolean
-}
-
-/**
  * FundingRate update
  */
 export type FundingRateUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1086,32 +1006,6 @@ export type FundingRateUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inter
  * FundingRate updateMany
  */
 export type FundingRateUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * The data used to update FundingRates.
-   */
-  data: Prisma.XOR<Prisma.FundingRateUpdateManyMutationInput, Prisma.FundingRateUncheckedUpdateManyInput>
-  /**
-   * Filter which FundingRates to update
-   */
-  where?: Prisma.FundingRateWhereInput
-  /**
-   * Limit how many FundingRates to update.
-   */
-  limit?: number
-}
-
-/**
- * FundingRate updateManyAndReturn
- */
-export type FundingRateUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the FundingRate
-   */
-  select?: Prisma.FundingRateSelectUpdateManyAndReturn<ExtArgs> | null
-  /**
-   * Omit specific fields from the FundingRate
-   */
-  omit?: Prisma.FundingRateOmit<ExtArgs> | null
   /**
    * The data used to update FundingRates.
    */

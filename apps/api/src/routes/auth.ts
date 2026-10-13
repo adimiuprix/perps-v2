@@ -31,7 +31,7 @@ const authLimiter = rateLimit({
 authRouter.post("/signup", authLimiter, async (req, res) => {
   const { email, password } = parseOrThrow(signupSchema, req.body);
   const existing = await prisma.user.findFirst({
-    where: { email: { equals: email, mode: "insensitive" } },
+    where: { email: email.toLowerCase() },
     select: { id: true },
   });
   if (existing) throw new HttpError(409, "An account with this email already exists.");
@@ -39,7 +39,7 @@ authRouter.post("/signup", authLimiter, async (req, res) => {
   let user;
   try {
     user = await prisma.user.create({
-      data: { email, passwordHash, balance: STARTING_BALANCE, lockedBalance: 0 },
+      data: { email: email.toLowerCase(), passwordHash, balance: STARTING_BALANCE, lockedBalance: 0 },
       select: userSelect,
     });
   } catch (err) {
@@ -51,9 +51,9 @@ authRouter.post("/signup", authLimiter, async (req, res) => {
 
 authRouter.post("/login", authLimiter, async (req, res) => {
   const { email, password } = parseOrThrow(loginSchema, req.body);
-  let user = await prisma.user.findUnique({ where: { email } });
+  let user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (!user) {
-    user = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
+    user = await prisma.user.findFirst({ where: { email: email.toLowerCase() } });
   }
   const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
   if (!user || !valid) throw new HttpError(400, "Invalid credentials");
