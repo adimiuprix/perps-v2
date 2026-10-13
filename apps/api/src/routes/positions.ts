@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "@repo/db";
 import { getIndexPrice } from "@repo/redis";
-import { isMarketId, liquidationPrice, marginRatio, roundMoney, roundQty, unrealizedPnl } from "@repo/common";
+import { isMarketId, liquidationPrice, marginRatio, roundMoney, roundQty, unrealizedPnl, EVENT_TYPES, STREAMS } from "@repo/common";
 import { redis } from "../lib/context";
 import { HttpError, parseOrThrow, userIdOf } from "../lib/http";
 import { closePositionSchema } from "../lib/schemas";
@@ -64,11 +64,31 @@ positionsRouter.post("/positions/close", authMiddleware, async (req, res) => {
     return;
   }
 
+  // Cancel all opposite-side limit orders to prevent self-trading
+  const closeSide = position.side === "long" ? "sell" : "buy";
+  const oppositeSide = position.side === "long" ? "buy" : "sell";
+  const oppositeOrders = await prisma.order.findMany({
+    where: {
+      userId,
+      market: position.market,
+      side: oppositeSide,
+      type: "limit",
+      reduceOnly: false,
+      status: { in: ["open", "partial"] },
+    },
+  });
+
+  // Cancel opposite orders via Redis events
+  for (const order of oppositeOrders) {
+    const event: any = { orderId: order.id, userId, market: order.market, timestamp: Date.now() };
+    await redis.xadd(STREAMS.ORDER_EVENTS, "*", "type", EVENT_TYPES.ORDER_CANCEL, "data", JSON.stringify(event));
+  }
+
   // Try market order first
   let placed = await placeOrder({
     userId,
     market: position.market,
-    side: position.side === "long" ? "sell" : "buy",
+    side: closeSide,
     type: "market",
     quantity: position.quantity,
     leverage: Math.max(1, Math.round(position.leverage)),
@@ -85,7 +105,7 @@ positionsRouter.post("/positions/close", authMiddleware, async (req, res) => {
       placed = await placeOrder({
         userId,
         market: position.market,
-        side: position.side === "long" ? "sell" : "buy",
+        side: closeSide,
         type: "limit",
         price: index.price,
         quantity: position.quantity,
